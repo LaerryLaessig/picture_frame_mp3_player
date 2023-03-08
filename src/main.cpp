@@ -4,10 +4,11 @@
 SoftwareSerial mySoftwareSerial(10, 11); // RX, TX
 DFRobotDFPlayerMini myDFPlayer;
 int input_signal=7; 
-int input_state=0;
+int input_state=LOW;
 long number_of_files=0; 
-int sound_volume=30;
-
+int sound_volume=70;
+int rnd_number=0;
+int val = 0;
 void setup()
 {
   
@@ -28,15 +29,30 @@ void setup()
     number_of_files=myDFPlayer.readFileCounts();
     Serial.println("===================================");
     Serial.print(" Number of files: ");
-    Serial.print(number_of_files);
+    Serial.println(number_of_files);
   }
   pinMode(input_signal, INPUT);
 }
 
+void wait_mp3_finished() {
+  delay(1000);
+
+}
+
 void loop()
 {
-input_state=digitalRead(input_signal);
-if (input_state == HIGH) { 
- myDFPlayer.play(random(0, number_of_files));  
+  val = digitalRead(input_signal);
+if (val == HIGH) { 
+ if(input_state == LOW) { 
+  rnd_number = random(number_of_files);
+  Serial.print("Play file: ");
+  Serial.println(rnd_number);
+  myDFPlayer.play(rnd_number);  
+  wait_mp3_finished();
+  input_state = HIGH;
  } 
+} else {
+  Serial.println("Motion ends");
+  input_state = LOW;
+}
 }
